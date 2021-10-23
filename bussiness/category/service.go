@@ -1,8 +1,11 @@
 package category
 
+import "time"
+
 type CategoryField struct {
-	Name      string `json:"name"`
-	Is_active bool   `json:"is_active"`
+	Name       string `json:"name"`
+	Is_active  bool   `json:"is_active"`
+	Created_At time.Time
 }
 
 type service struct {
@@ -34,6 +37,7 @@ func (s *service) CreateCategory(categoryField CategoryField) error {
 	category := NewCategory(
 		categoryField.Name,
 		categoryField.Is_active,
+		categoryField.Created_At,
 	)
 
 	err := s.repository.CreateCategory(category)
@@ -47,9 +51,10 @@ func (s *service) CreateCategory(categoryField CategoryField) error {
 
 func (s *service) UpdateCategory(categoryField CategoryField, id int) error {
 
-	category := NewCategory(
+	category := UpdateCategory(
 		categoryField.Name,
 		categoryField.Is_active,
+		categoryField.Created_At,
 	)
 
 	err := s.repository.UpdateCategory(category, id)
