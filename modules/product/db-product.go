@@ -49,7 +49,6 @@ func (field *ProductTable) ToProduct() product.Product {
 	product.Description = field.Description
 	product.Image = field.Image
 	product.Is_active = field.Is_active
-
 	return product
 }
 

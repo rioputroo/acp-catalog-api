@@ -1,6 +1,9 @@
 package product
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type ProductField struct {
 	Category_id int
@@ -9,8 +12,8 @@ type ProductField struct {
 	Description string
 	Image       string
 	Is_active   bool
+	Created_At  time.Time
 }
-
 type service struct {
 	repository Repository
 }
@@ -52,6 +55,7 @@ func (s *service) CreateProduct(productField ProductField) error {
 		productField.Description,
 		productField.Image,
 		productField.Is_active,
+		productField.Created_At,
 	)
 
 	fmt.Println("service", &product)
@@ -67,13 +71,14 @@ func (s *service) CreateProduct(productField ProductField) error {
 
 func (s *service) UpdateProduct(productField ProductField, id int) error {
 
-	product := NewProduct(
+	product := UpdateProduct(
 		productField.Category_id,
 		productField.Name,
 		productField.Price,
 		productField.Description,
 		productField.Image,
 		productField.Is_active,
+		productField.Created_At,
 	)
 
 	fmt.Println(productField)
