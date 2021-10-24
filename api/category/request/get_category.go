@@ -8,7 +8,7 @@ type ResCategoryById struct {
 	Is_active bool   `json:"is_active"`
 }
 
-func GetProductById(category category.Category) *ResCategoryById {
+func GetCategoryById(category category.Category) *ResCategoryById {
 
 	var resCategoryById ResCategoryById
 	resCategoryById.Id = category.Id
