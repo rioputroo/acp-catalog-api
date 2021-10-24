@@ -6,7 +6,7 @@ type ResCategory struct {
 	Category []ResCategoryById
 }
 
-func GetProducts(product []category.Category) ResCategory {
+func GetAllCategory(product []category.Category) ResCategory {
 
 	resCategory := ResCategory{}
 
