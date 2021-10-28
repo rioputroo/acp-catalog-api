@@ -10,7 +10,7 @@ type Repository struct {
 	mock.Mock
 }
 
-func (t *Repository) GetProducts() ([]product.Product, error) {
+func (t *Repository) GetAllProducts() ([]product.Product, error) {
 	ret := t.Called()
 	var tProductSuccess []product.Product
 
@@ -33,8 +33,8 @@ func (t *Repository) GetProducts() ([]product.Product, error) {
 	return tProductSuccess, tProductError
 }
 
-func (_m *Repository) GetProductById(id int) (*product.Product, error) {
-	ret := _m.Called(id)
+func (t *Repository) GetProductById(id int) (*product.Product, error) {
+	ret := t.Called(id)
 
 	var tProductSuccess *product.Product
 	if rf, ok := ret.Get(0).(func(int) *product.Product); ok {
@@ -53,4 +53,42 @@ func (_m *Repository) GetProductById(id int) (*product.Product, error) {
 	}
 
 	return tProductSuccess, tProductError
+}
+
+func (t *Repository) CreateProduct(_t product.Product) error {
+	ret := t.Called(_t)
+
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(product.Product) error); ok {
+		tProductError = rf(_t)
+	} else {
+		tProductError = ret.Error(0)
+	}
+	return tProductError
+}
+
+func (t *Repository) UpdateProduct(_t product.Product, id int) error {
+	ret := t.Called(_t, id)
+
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(product.Product, int) error); ok {
+		tProductError = rf(_t, id)
+	} else {
+		tProductError = ret.Error(0)
+	}
+
+	return tProductError
+
+}
+
+func (t *Repository) DeleteProduct(id int) error {
+	ret := t.Called(id)
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(int) error); ok {
+		tProductError = rf(id)
+	} else {
+		tProductError = ret.Error(0)
+	}
+
+	return tProductError
 }

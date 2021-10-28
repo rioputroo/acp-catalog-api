@@ -28,6 +28,7 @@ func (controller *Controller) GetProductsById(c echo.Context) error {
 	}
 
 	responseProduct := request.GetProductById(*product)
+
 	return c.JSON(response.NewSuccessResponse(responseProduct))
 }
 

@@ -1,7 +1,6 @@
 package product
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -26,18 +25,13 @@ func NewService(repository Repository) Service {
 
 func (s *service) GetProductById(id int) (*Product, error) {
 
-	product, _ := s.repository.GetProductById(id)
+	return s.repository.GetProductById(id)
 
-	fmt.Println("Service", product)
-
-	return product, nil
 }
 
 func (s *service) GetAllProducts() ([]Product, error) {
 
 	product, err := s.repository.GetAllProducts()
-
-	fmt.Println("Service", product)
 
 	if err != nil {
 		return []Product{}, err
@@ -57,8 +51,6 @@ func (s *service) CreateProduct(productField ProductField) error {
 		productField.Is_active,
 		productField.Created_At,
 	)
-
-	fmt.Println("service", &product)
 
 	err := s.repository.CreateProduct(product)
 
@@ -81,8 +73,6 @@ func (s *service) UpdateProduct(productField ProductField, id int) error {
 		productField.Created_At,
 	)
 
-	fmt.Println(productField)
-
 	err := s.repository.UpdateProduct(product, id)
 
 	if err != nil {
@@ -96,7 +86,6 @@ func (s *service) DeleteProduct(id int) error {
 
 	err := s.repository.DeleteProduct(id)
 
-	fmt.Println(&err)
 	if err != nil {
 		return err
 	}

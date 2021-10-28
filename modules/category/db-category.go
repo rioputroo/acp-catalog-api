@@ -98,7 +98,6 @@ func (temp *DbRepository) UpdateCategory(category category.Category, id int) err
 func (temp *DbRepository) DeleteCategory(id int) error {
 
 	var category CategoryTable
-
 	err := temp.DB.Delete(&category, id).Error
 	if err != nil {
 		return err
