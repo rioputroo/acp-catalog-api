@@ -10,7 +10,7 @@ type Service struct {
 	mock.Mock
 }
 
-func (t *Service) GetProducts() ([]product.Product, error) {
+func (t *Service) GetAllProducts() ([]product.Product, error) {
 	ret := t.Called()
 	var tProductSuccess []product.Product
 
@@ -31,8 +31,8 @@ func (t *Service) GetProducts() ([]product.Product, error) {
 	return tProductSuccess, tProductError
 }
 
-func (_m *Service) GetProductById(id int) (*product.Product, error) {
-	ret := _m.Called(id)
+func (t *Service) GetProductById(id int) (*product.Product, error) {
+	ret := t.Called(id)
 
 	var tProductSuccess *product.Product
 	if rf, ok := ret.Get(0).(func(int) *product.Product); ok {
@@ -50,4 +50,42 @@ func (_m *Service) GetProductById(id int) (*product.Product, error) {
 		tProductError = ret.Error(1)
 	}
 	return tProductSuccess, tProductError
+}
+
+func (t *Service) CreateProduct(productField product.ProductField) error {
+	ret := t.Called(productField)
+
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(product.ProductField) error); ok {
+		tProductError = rf(productField)
+	} else {
+		tProductError = ret.Error(0)
+	}
+
+	return tProductError
+}
+
+func (t *Service) DeleteProduct(id int) error {
+	ret := t.Called(id)
+
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(int) error); ok {
+		tProductError = rf(id)
+	} else {
+		tProductError = ret.Error(0)
+	}
+	return tProductError
+}
+
+func (t *Service) UpdateProduct(productField product.ProductField, id int) error {
+	ret := t.Called(productField, id)
+
+	var tProductError error
+	if rf, ok := ret.Get(0).(func(product.ProductField, int) error); ok {
+		tProductError = rf(productField, id)
+	} else {
+		tProductError = ret.Error(0)
+	}
+
+	return tProductError
 }

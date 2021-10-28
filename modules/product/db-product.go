@@ -2,7 +2,6 @@ package product
 
 import (
 	"catalog/bussiness/product"
-	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -66,8 +65,6 @@ func (temp *DbRepository) GetProductById(id int) (*product.Product, error) {
 		return nil, err
 	}
 	product := data.ToProduct()
-
-	fmt.Println("repo", &product)
 	return &product, nil
 }
 
@@ -84,8 +81,6 @@ func (temp *DbRepository) GetAllProducts() ([]product.Product, error) {
 		result = append(result, value.ToProduct())
 	}
 
-	fmt.Println("Repo", &result)
-
 	return result, nil
 
 }
@@ -94,7 +89,6 @@ func (temp *DbRepository) CreateProduct(product product.Product) error {
 
 	data := newProduct(product)
 
-	fmt.Println("repo", data)
 	err := temp.DB.Save(data).Error
 	if err != nil {
 		return err
@@ -106,8 +100,6 @@ func (temp *DbRepository) CreateProduct(product product.Product) error {
 func (temp *DbRepository) UpdateProduct(product product.Product, id int) error {
 
 	data := newProduct(product)
-
-	fmt.Println(&data)
 	err := temp.DB.Where("id = ?", &id).Updates(&data).Error
 	if err != nil {
 		return err
@@ -121,7 +113,7 @@ func (temp *DbRepository) DeleteProduct(id int) error {
 	var product ProductTable
 
 	err := temp.DB.Delete(&product, id).Error
-	fmt.Println("Repo", err)
+
 	if err != nil {
 		return err
 	}
