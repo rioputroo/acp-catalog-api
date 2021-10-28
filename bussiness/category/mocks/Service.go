@@ -22,13 +22,13 @@ func (t *Service) GetAllCategory() ([]category.Category, error) {
 		}
 	}
 
-	var tCatError error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		tCatError = rf()
-	} else {
-		tCatError = ret.Error(1)
-	}
-	return tCatSuccess, tCatError
+	// var tCatError error
+	// if rf, ok := ret.Get(1).(func() error); ok {
+	// 	tCatError = rf()
+	// } else {
+	// 	tCatError = ret.Error(1)
+	// }
+	return tCatSuccess, nil
 }
 
 func (t *Service) GetCategoryById(id int) (*category.Category, error) {

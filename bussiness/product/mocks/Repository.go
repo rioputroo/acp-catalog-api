@@ -22,15 +22,15 @@ func (t *Repository) GetAllProducts() ([]product.Product, error) {
 		}
 	}
 
-	var tProductError error
+	// var tProductError error
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		tProductError = rf()
-	} else {
-		tProductError = ret.Error(1)
-	}
+	// if rf, ok := ret.Get(1).(func() error); ok {
+	// 	tProductError = rf()
+	// } else {
+	// 	tProductError = ret.Error(1)
+	// }
 
-	return tProductSuccess, tProductError
+	return tProductSuccess, nil
 }
 
 func (t *Repository) GetProductById(id int) (*product.Product, error) {

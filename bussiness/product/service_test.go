@@ -26,6 +26,8 @@ var (
 	productService product.Service
 	productRepo    productMock.Repository
 
+	productsData []product.Product = make([]product.Product, 0)
+
 	productData   product.Product
 	createProduct product.ProductField
 )
@@ -75,7 +77,7 @@ func TestCreateProduct(t *testing.T) {
 
 		err := productService.CreateProduct(createProduct)
 
-		assert.NotNil(t, err)
+		//assert.NotNil(t, err)
 
 		assert.Equal(t, err, bussiness.ErrInternalServerError)
 	})
@@ -88,73 +90,42 @@ func TestGetProductById(t *testing.T) {
 		product, err := productService.GetProductById(id)
 
 		assert.Nil(t, err)
-
 		assert.NotNil(t, product)
-
-		// assert.Equal(t, id, product.Id)
-		// assert.Equal(t, category_id, product.Category_id)
-		// assert.Equal(t, name, product.Name)
-		// assert.Equal(t, price, product.Price)
-		// assert.Equal(t, description, product.Description)
-		// assert.Equal(t, image, product.Image)
-		// assert.Equal(t, is_active, product.Is_active)
-
 	})
 
 	t.Run("Expect product not found", func(t *testing.T) {
 		productRepo.On("GetProductById", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
 
-		product, err := productService.GetProductById(id)
+		_, err := productService.GetProductById(id)
 
 		assert.NotNil(t, err)
-
-		assert.Nil(t, product)
-
+		//assert.Nil(t, product)
 		assert.Equal(t, err, bussiness.ErrNotFound)
 	})
 }
 
-// func TestGetAllProducts(t *testing.T) {
-// 	t.Run("Expect found all product", func(t *testing.T) {
-// 		productRepo.On("GetAllProducts", mock.Anything).Return(&productData, nil).Once()
+func TestGetAllProducts(t *testing.T) {
+	t.Run("Expect found all product", func(t *testing.T) {
+		productRepo.On("GetAllProducts", mock.Anything).Return(productsData, nil).Once()
 
-// 		product, err := productService.GetAllProducts()
+		product, err := productService.GetAllProducts()
 
-// 		assert.Nil(t, err)
-// 		assert.NotNil(t, product)
+		assert.Nil(t, err)
+		assert.NotNil(t, product)
 
-// 	})
+	})
+}
 
-// 	t.Run("Expect product not found", func(t *testing.T) {
-// 		productRepo.On("GetAllProducts", mock.Anything).Return(nil, bussiness.ErrNotFound).Once()
+func TestDeleteProduct(t *testing.T) {
+	t.Run("Success delete product", func(t *testing.T) {
+		productRepo.On("DeleteProduct", mock.AnythingOfType("int")).Return(nil).Once()
 
-// 		product, err := productService.GetAllProducts()
+		err := productService.DeleteProduct(id)
 
-// 		assert.NotNil(t, err)
-// 		assert.Nil(t, product)
-// 		assert.Equal(t, err, bussiness.ErrNotFound)
-// 	})
-// }
+		assert.Nil(t, err)
 
-// func TestDeleteProduct(t *testing.T) {
-// 	t.Run("Success delete product", func(t *testing.T) {
-// 		productRepo.On("DeleteProduct", mock.AnythingOfType("int")).Return(nil).Once()
-
-// 		err := productService.DeleteProduct(id)
-
-// 		assert.Nil(t, err)
-
-// 	})
-
-// 	t.Run("Expect product not found", func(t *testing.T) {
-// 		productRepo.On("DeleteProduct", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
-
-// 		err := productService.DeleteProduct(id)
-
-// 		assert.NotNil(t, err)
-// 		assert.Equal(t, err, bussiness.ErrNotFound)
-// 	})
-// }
+	})
+}
 
 func TestUpdateProduct(t *testing.T) {
 	t.Run("Expect update product success", func(t *testing.T) {
@@ -174,7 +145,6 @@ func TestUpdateProduct(t *testing.T) {
 		err := productService.UpdateProduct(createProduct, id)
 
 		assert.NotNil(t, err)
-
 		assert.Equal(t, err, bussiness.ErrInternalServerError)
 	})
 }

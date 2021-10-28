@@ -22,15 +22,15 @@ func (t *Repository) GetAllCategory() ([]category.Category, error) {
 		}
 	}
 
-	var tCatError error
+	// var tCatError error
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		tCatError = rf()
-	} else {
-		tCatError = ret.Error(1)
-	}
+	// if rf, ok := ret.Get(1).(func() error); ok {
+	// 	tCatError = rf()
+	// } else {
+	// 	tCatError = ret.Error(1)
+	// }
 
-	return tCatSuccess, tCatError
+	return tCatSuccess, nil
 }
 
 func (t *Repository) GetCategoryById(id int) (*category.Category, error) {
