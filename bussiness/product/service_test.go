@@ -81,35 +81,77 @@ func TestCreateProduct(t *testing.T) {
 	})
 }
 
-// func TestGetProductById(t *testing.T) {
-// 	t.Run("Expect found the product", func(t *testing.T) {
-// 		productRepo.On("GetProductById", mock.AnythingOfType("int")).Return(&productData, nil).Once()
+func TestGetProductById(t *testing.T) {
+	t.Run("Expect found the product", func(t *testing.T) {
+		productRepo.On("GetProductById", mock.AnythingOfType("int")).Return(&productData, nil).Once()
 
-// 		product, err := productService.GetProductById(id)
+		product, err := productService.GetProductById(id)
+
+		assert.Nil(t, err)
+
+		assert.NotNil(t, product)
+
+		// assert.Equal(t, id, product.Id)
+		// assert.Equal(t, category_id, product.Category_id)
+		// assert.Equal(t, name, product.Name)
+		// assert.Equal(t, price, product.Price)
+		// assert.Equal(t, description, product.Description)
+		// assert.Equal(t, image, product.Image)
+		// assert.Equal(t, is_active, product.Is_active)
+
+	})
+
+	t.Run("Expect product not found", func(t *testing.T) {
+		productRepo.On("GetProductById", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
+
+		product, err := productService.GetProductById(id)
+
+		assert.NotNil(t, err)
+
+		assert.Nil(t, product)
+
+		assert.Equal(t, err, bussiness.ErrNotFound)
+	})
+}
+
+// func TestGetAllProducts(t *testing.T) {
+// 	t.Run("Expect found all product", func(t *testing.T) {
+// 		productRepo.On("GetAllProducts", mock.Anything).Return(&productData, nil).Once()
+
+// 		product, err := productService.GetAllProducts()
 
 // 		assert.Nil(t, err)
-
 // 		assert.NotNil(t, product)
-
-// 		assert.Equal(t, id, product.Id)
-// 		assert.Equal(t, category_id, product.Category_id)
-// 		assert.Equal(t, name, product.Name)
-// 		assert.Equal(t, price, product.Price)
-// 		assert.Equal(t, description, product.Description)
-// 		assert.Equal(t, image, product.Image)
-// 		assert.Equal(t, is_active, product.Is_active)
 
 // 	})
 
 // 	t.Run("Expect product not found", func(t *testing.T) {
-// 		productRepo.On("GetProductById", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
+// 		productRepo.On("GetAllProducts", mock.Anything).Return(nil, bussiness.ErrNotFound).Once()
 
-// 		product, err := productService.GetProductById(id)
+// 		product, err := productService.GetAllProducts()
 
 // 		assert.NotNil(t, err)
-
 // 		assert.Nil(t, product)
+// 		assert.Equal(t, err, bussiness.ErrNotFound)
+// 	})
+// }
 
+// func TestDeleteProduct(t *testing.T) {
+// 	t.Run("Success delete product", func(t *testing.T) {
+// 		productRepo.On("DeleteProduct", mock.AnythingOfType("int")).Return(nil).Once()
+
+// 		err := productService.DeleteProduct(id)
+
+// 		assert.Nil(t, err)
+
+// 	})
+
+// 	t.Run("Expect product not found", func(t *testing.T) {
+// 		productRepo.On("DeleteProduct", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
+
+// 		err := productService.DeleteProduct(id)
+
+// 		assert.NotNil(t, err)
 // 		assert.Equal(t, err, bussiness.ErrNotFound)
 // 	})
 // }

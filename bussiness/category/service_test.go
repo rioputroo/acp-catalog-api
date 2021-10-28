@@ -48,6 +48,30 @@ func setup() {
 
 }
 
+func TestGetCategotyById(t *testing.T) {
+	t.Run("Expect found the category", func(t *testing.T) {
+		catRepo.On("GetCategoryById", mock.AnythingOfType("int")).Return(&catData, nil).Once()
+
+		category, err := catService.GetCategoryById(id)
+
+		assert.Nil(t, err)
+
+		assert.NotNil(t, category)
+	})
+
+	t.Run("Expect category not found", func(t *testing.T) {
+		catRepo.On("GetCategoryById", mock.AnythingOfType("int")).Return(nil, bussiness.ErrNotFound).Once()
+
+		category, err := catService.GetCategoryById(id)
+
+		assert.NotNil(t, err)
+
+		assert.Nil(t, category)
+
+		assert.Equal(t, err, bussiness.ErrNotFound)
+	})
+}
+
 func TestCreateCategory(t *testing.T) {
 	t.Run("Expect create category success", func(t *testing.T) {
 		catRepo.On("CreateCategory", mock.AnythingOfType("category.Category"), mock.AnythingOfType("string")).Return(nil).Once()
