@@ -22,13 +22,13 @@ func (t *Service) GetAllProducts() ([]product.Product, error) {
 		}
 	}
 
-	var tProductError error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		tProductError = rf()
-	} else {
-		tProductError = ret.Error(1)
-	}
-	return tProductSuccess, tProductError
+	// var tProductError error
+	// if rf, ok := ret.Get(1).(func() error); ok {
+	// 	tProductError = rf()
+	// } else {
+	// 	tProductError = ret.Error(1)
+	// }
+	return tProductSuccess, nil
 }
 
 func (t *Service) GetProductById(id int) (*product.Product, error) {
