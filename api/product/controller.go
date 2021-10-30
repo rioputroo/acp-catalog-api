@@ -24,23 +24,30 @@ func (controller *Controller) GetProductsById(c echo.Context) error {
 
 	product, err := controller.service.GetProductById(id)
 	if err != nil {
-		return c.JSON(response.NewErrorBusinessResponse(err))
+		return c.JSON(response.NewBadRequestResponse())
 	}
 
 	responseProduct := request.GetProductById(*product)
 
-	return c.JSON(response.NewSuccessResponse(responseProduct))
+	return c.JSON(response.NewSuccessResponse(responseProduct, "successfully fetch product"))
 }
 
 func (controller *Controller) GetAllProducts(c echo.Context) error {
 
-	products, err := controller.service.GetAllProducts()
+	queryCatId, _ := strconv.Atoi(c.QueryParam("categoryId"))
+	products, err := controller.service.GetAllProducts(queryCatId)
+
+	if &queryCatId != nil {
+		resProductsByCategoryId, _ := controller.service.GetAllProducts(queryCatId)
+		return c.JSON(response.NewSuccessResponse(resProductsByCategoryId, "successfully filter product by category id"))
+	}
+
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
 
 	responseProduct := request.GetProducts(products)
-	return c.JSON(response.NewSuccessResponse(responseProduct))
+	return c.JSON(response.NewSuccessResponse(responseProduct, "successfully fetch list of products"))
 }
 
 func (controller *Controller) CreateProduct(c echo.Context) error {
@@ -56,7 +63,7 @@ func (controller *Controller) CreateProduct(c echo.Context) error {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
 
-	return c.JSON(response.NewSuccessResponseWithoutData())
+	return c.JSON(response.NewSuccessResponseWithoutData("product created"))
 }
 
 func (controller *Controller) DeleteProduct(c echo.Context) error {
@@ -67,7 +74,7 @@ func (controller *Controller) DeleteProduct(c echo.Context) error {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
 
-	return c.JSON(response.NewSuccessResponseNoContent())
+	return c.JSON(response.NewSuccessResponseNoContent("successfully delete product"))
 
 }
 
@@ -84,5 +91,5 @@ func (controller *Controller) UpdateProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
-	return c.JSON(response.NewSuccessResponseWithoutData())
+	return c.JSON(response.NewSuccessResponseWithoutData("successfully update product"))
 }

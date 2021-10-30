@@ -17,28 +17,28 @@ type SuccessResponse struct {
 }
 
 //NewSuccessResponse create new success payload
-func NewSuccessResponse(data interface{}) (int, SuccessResponse) {
+func NewSuccessResponse(data interface{}, msg string) (int, SuccessResponse) {
 	return http.StatusOK, SuccessResponse{
 		Success,
-		"Success",
+		msg,
 		data,
 	}
 }
 
 //NewSuccessResponse create new success payload
-func NewSuccessResponseWithoutData() (int, SuccessResponse) {
+func NewSuccessResponseWithoutData(msg string) (int, SuccessResponse) {
 	return http.StatusOK, SuccessResponse{
 		Success,
-		"Success",
+		msg,
 		map[string]interface{}{},
 	}
 }
 
 //NewSuccessResponse create new success payload
-func NewSuccessResponseNoContent() (int, SuccessResponse) {
+func NewSuccessResponseNoContent(msg string) (int, SuccessResponse) {
 	return http.StatusNoContent, SuccessResponse{
 		Success,
-		"Success",
+		msg,
 		map[string]interface{}{},
 	}
 }
