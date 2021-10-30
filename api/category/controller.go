@@ -30,7 +30,7 @@ func (controller *Controller) GetCategoryById(c echo.Context) error {
 
 	resCategory := request.GetCategoryById(*category)
 
-	return c.JSON(response.NewSuccessResponse(resCategory))
+	return c.JSON(response.NewSuccessResponse(resCategory, "successfully fetch product"))
 }
 
 func (controller *Controller) GetAllcategory(c echo.Context) error {
@@ -43,7 +43,7 @@ func (controller *Controller) GetAllcategory(c echo.Context) error {
 
 	resCategory := request.GetAllCategory(allCategory)
 
-	return c.JSON(response.NewSuccessResponse(resCategory))
+	return c.JSON(response.NewSuccessResponse(resCategory, "successfully fetch list of categories"))
 }
 
 func (controller *Controller) CreateCategory(c echo.Context) error {
@@ -56,7 +56,7 @@ func (controller *Controller) CreateCategory(c echo.Context) error {
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
-	return c.JSON(response.NewSuccessResponseWithoutData())
+	return c.JSON(response.NewSuccessResponseWithoutData("category created"))
 }
 
 func (controller *Controller) DeleteCategory(c echo.Context) error {
@@ -65,7 +65,7 @@ func (controller *Controller) DeleteCategory(c echo.Context) error {
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
-	return c.JSON(response.NewSuccessResponseNoContent())
+	return c.JSON(response.NewSuccessResponseNoContent("successfully delete category"))
 
 }
 
@@ -82,5 +82,5 @@ func (controller *Controller) UpdateCategory(c echo.Context) error {
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
-	return c.JSON(response.NewSuccessResponseWithoutData())
+	return c.JSON(response.NewSuccessResponseWithoutData("successfully update category"))
 }
