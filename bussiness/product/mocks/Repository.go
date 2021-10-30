@@ -10,7 +10,7 @@ type Repository struct {
 	mock.Mock
 }
 
-func (t *Repository) GetAllProducts() ([]product.Product, error) {
+func (t *Repository) GetAllProducts(categoryId int) ([]product.Product, error) {
 	ret := t.Called()
 	var tProductSuccess []product.Product
 

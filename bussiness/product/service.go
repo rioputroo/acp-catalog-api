@@ -29,9 +29,13 @@ func (s *service) GetProductById(id int) (*Product, error) {
 
 }
 
-func (s *service) GetAllProducts() ([]Product, error) {
+func (s *service) GetAllProducts(categoryId int) ([]Product, error) {
 
-	product, err := s.repository.GetAllProducts()
+	if &categoryId != nil {
+		return s.repository.GetAllProducts(categoryId)
+	}
+
+	product, err := s.repository.GetAllProducts(categoryId)
 
 	if err != nil {
 		return []Product{}, err
