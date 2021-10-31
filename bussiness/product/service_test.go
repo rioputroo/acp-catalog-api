@@ -6,7 +6,6 @@ import (
 	productMock "catalog/bussiness/product/mocks"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -44,9 +43,7 @@ func setup() {
 		name,
 		price,
 		description,
-		image,
 		is_active,
-		time.Now(),
 	)
 
 	createProduct = product.ProductField{
@@ -54,16 +51,15 @@ func setup() {
 		Name:        name,
 		Price:       price,
 		Description: description,
-		Image:       image,
 		IsActive:    is_active,
 	}
 
-	productService = product.NewService(&productRepo)
+	productService = product.NewService(&productRepo, nil)
 
 }
 
 func TestCreateProduct(t *testing.T) {
-	t.Run("Expect create user success", func(t *testing.T) {
+	t.Run("Expect create product success", func(t *testing.T) {
 		productRepo.On("CreateProduct", mock.AnythingOfType("product.Product"), mock.AnythingOfType("string")).Return(nil).Once()
 
 		err := productService.CreateProduct(createProduct)
