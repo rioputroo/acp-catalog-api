@@ -1,20 +1,24 @@
 package request
 
-import "catalog/bussiness/category"
+import (
+	"catalog/bussiness/category"
+	"gorm.io/gorm"
+)
 
 type ResCategory struct {
-	Category []ResCategoryById
+	*gorm.Model
+	Category []ResCategoryById `json:"category"`
 }
 
-func GetAllCategory(product []category.Category) ResCategory {
+func GetAllCategory(categories []category.Category) ResCategory {
+	var resCategoryById ResCategoryById
 
 	resCategory := ResCategory{}
 
-	for i := 0; i < len(product); i++ {
-		var resCategoryById ResCategoryById
-		resCategoryById.Id = product[i].Id
-		resCategoryById.Name = product[i].Name
-		resCategoryById.Is_active = product[i].Is_active
+	for i := 0; i < len(categories); i++ {
+		resCategoryById.Id = int(categories[i].ID)
+		resCategoryById.Name = categories[i].Name
+		resCategoryById.IsActive = categories[i].IsActive
 		resCategory.Category = append(resCategory.Category, resCategoryById)
 	}
 	return resCategory

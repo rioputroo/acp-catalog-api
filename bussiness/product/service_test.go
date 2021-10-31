@@ -50,12 +50,12 @@ func setup() {
 	)
 
 	createProduct = product.ProductField{
-		Category_id: category_id,
+		CategoryId:  category_id,
 		Name:        name,
 		Price:       price,
 		Description: description,
 		Image:       image,
-		Is_active:   is_active,
+		IsActive:    is_active,
 	}
 
 	productService = product.NewService(&productRepo)

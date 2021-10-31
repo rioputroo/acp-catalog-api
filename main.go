@@ -5,10 +5,13 @@ import (
 	productController "catalog/api/product"
 	productService "catalog/bussiness/product"
 	"catalog/config"
+	"catalog/config/rabbitmq"
 	"catalog/modules/migration"
 	productRepository "catalog/modules/product"
+	"catalog/modules/product/rabbitmq/consumer"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	categoryController "catalog/api/category"
@@ -75,8 +78,16 @@ func ConnectionMysql() *gorm.DB {
 
 func main() {
 	Conn := ConnectionMysql()
+
+	rabbitmq := rabbitmq.RabbitConnection()
+
+	productRabbitmq := consumer.NewRabbitmqRepository(rabbitmq)
+
 	prodRepository := productRepository.NewProductRepository(Conn)
-	prodService := productService.NewService(prodRepository)
+
+	//prodService := productService.NewService(prodRepository)
+	prodService := productService.NewService(prodRepository, productRabbitmq)
+
 	prodHandler := productController.NewController(prodService)
 
 	catRepository := categoryRepository.NewCategoryRepository(Conn)
@@ -86,5 +97,5 @@ func main() {
 	e := echo.New()
 	api.HandlerApi(e, prodHandler, catHandler)
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(os.Getenv("CATALOG_APP_PORT")))
 }

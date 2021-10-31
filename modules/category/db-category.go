@@ -2,8 +2,6 @@ package category
 
 import (
 	"catalog/bussiness/category"
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -12,30 +10,28 @@ type DbRepository struct {
 }
 
 type CategoryTable struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	Is_active  bool   `json:"is_active"`
-	Created_At time.Time
-	Updated_At time.Time
+	gorm.Model
+	ID       uint   `json:"id" gorm:"id;primaryKey;autoIncrement"`
+	Name     string `json:"name" gorm:"name"`
+	IsActive bool   `json:"is_active" gorm:"is_active"`
 }
 
 //get field category form bussiness
 func newProduct(categoryTemp category.Category) *CategoryTable {
 	return &CategoryTable{
-		categoryTemp.Id,
+		categoryTemp.Model,
+		categoryTemp.ID,
 		categoryTemp.Name,
-		categoryTemp.Is_active,
-		categoryTemp.Created_At,
-		categoryTemp.Updated_At,
+		categoryTemp.IsActive,
 	}
 }
 
 func (field *CategoryTable) ToCategory() category.Category {
 
 	var category category.Category
-	category.Id = field.Id
+	category.ID = field.ID
 	category.Name = field.Name
-	category.Is_active = field.Is_active
+	category.IsActive = field.IsActive
 
 	return category
 }

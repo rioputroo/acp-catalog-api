@@ -42,8 +42,8 @@ func setup() {
 	)
 
 	createCat = category.CategoryField{
-		Name:      name,
-		Is_active: is_active,
+		Name:     name,
+		IsActive: is_active,
 	}
 
 	catService = category.NewService(&catRepo)

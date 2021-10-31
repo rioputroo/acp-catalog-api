@@ -1,25 +1,23 @@
 package product
 
-import (
-	"time"
-)
+import "catalog/modules/product/rabbitmq/consumer"
 
 type ProductField struct {
-	Category_id int
-	Name        string
-	Price       int
-	Description string
-	Image       string
-	Is_active   bool
-	Created_At  time.Time
+	CategoryId  int    `json:"category_id"`
+	Name        string `json:"name"`
+	Price       int    `json:"price"`
+	Description string `json:"description"`
+	IsActive    bool   `json:"is_active"`
 }
 type service struct {
 	repository Repository
+	rabbit     consumer.RabbitRepository
 }
 
-func NewService(repository Repository) Service {
+func NewService(repository Repository, rabbitmq *consumer.RabbitRepository) Service {
 	return &service{
 		repository,
+		*rabbitmq,
 	}
 }
 
@@ -54,13 +52,11 @@ func (s *service) GetAllProducts() ([]Product, error) {
 func (s *service) CreateProduct(productField ProductField) error {
 
 	product := NewProduct(
-		productField.Category_id,
+		productField.CategoryId,
 		productField.Name,
 		productField.Price,
 		productField.Description,
-		productField.Image,
-		productField.Is_active,
-		productField.Created_At,
+		productField.IsActive,
 	)
 
 	err := s.repository.CreateProduct(product)
@@ -75,13 +71,11 @@ func (s *service) CreateProduct(productField ProductField) error {
 func (s *service) UpdateProduct(productField ProductField, id int) error {
 
 	product := UpdateProduct(
-		productField.Category_id,
+		productField.CategoryId,
 		productField.Name,
 		productField.Price,
 		productField.Description,
-		productField.Image,
-		productField.Is_active,
-		productField.Created_At,
+		productField.IsActive,
 	)
 
 	err := s.repository.UpdateProduct(product, id)

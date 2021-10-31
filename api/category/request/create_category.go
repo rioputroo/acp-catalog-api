@@ -14,7 +14,7 @@ func (request *InsertReqCategory) InsertNewCategory() *category.CategoryField {
 	var InsertReqCategory category.CategoryField
 
 	InsertReqCategory.Name = request.Name
-	InsertReqCategory.Is_active = request.Is_active
+	InsertReqCategory.IsActive = request.Is_active
 
 	return &InsertReqCategory
 

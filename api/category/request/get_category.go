@@ -1,19 +1,23 @@
 package request
 
-import "catalog/bussiness/category"
+import (
+	"catalog/bussiness/category"
+	"gorm.io/gorm"
+)
 
 type ResCategoryById struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	Is_active bool   `json:"is_active"`
+	gorm.Model
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	IsActive bool   `json:"is_active"`
 }
 
 func GetCategoryById(category category.Category) *ResCategoryById {
 
 	var resCategoryById ResCategoryById
-	resCategoryById.Id = category.Id
+	resCategoryById.Id = int(category.ID)
 	resCategoryById.Name = category.Name
-	resCategoryById.Is_active = category.Is_active
+	resCategoryById.IsActive = category.IsActive
 
 	return &resCategoryById
 
