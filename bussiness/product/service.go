@@ -1,5 +1,7 @@
 package product
 
+import "catalog/modules/product/rabbitmq/consumer"
+
 type ProductField struct {
 	CategoryId  int    `json:"category_id"`
 	Name        string `json:"name"`
@@ -9,11 +11,13 @@ type ProductField struct {
 }
 type service struct {
 	repository Repository
+	rabbit     consumer.RabbitRepository
 }
 
-func NewService(repository Repository) Service {
+func NewService(repository Repository, rabbitmq *consumer.RabbitRepository) Service {
 	return &service{
 		repository,
+		*rabbitmq,
 	}
 }
 

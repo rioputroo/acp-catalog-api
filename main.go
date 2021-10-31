@@ -5,8 +5,10 @@ import (
 	productController "catalog/api/product"
 	productService "catalog/bussiness/product"
 	"catalog/config"
+	"catalog/config/rabbitmq"
 	"catalog/modules/migration"
 	productRepository "catalog/modules/product"
+	"catalog/modules/product/rabbitmq/consumer"
 	"fmt"
 	"log"
 	"os"
@@ -76,8 +78,16 @@ func ConnectionMysql() *gorm.DB {
 
 func main() {
 	Conn := ConnectionMysql()
+
+	rabbitmq := rabbitmq.RabbitConnection()
+
+	productRabbitmq := consumer.NewRabbitmqRepository(rabbitmq)
+
 	prodRepository := productRepository.NewProductRepository(Conn)
-	prodService := productService.NewService(prodRepository)
+
+	//prodService := productService.NewService(prodRepository)
+	prodService := productService.NewService(prodRepository, productRabbitmq)
+
 	prodHandler := productController.NewController(prodService)
 
 	catRepository := categoryRepository.NewCategoryRepository(Conn)
