@@ -21,13 +21,20 @@ func (t *Service) GetAllProducts() ([]product.Product, error) {
 			tProductSuccess = ret.Get(0).([]product.Product)
 		}
 	}
+	return tProductSuccess, nil
+}
 
-	// var tProductError error
-	// if rf, ok := ret.Get(1).(func() error); ok {
-	// 	tProductError = rf()
-	// } else {
-	// 	tProductError = ret.Error(1)
-	// }
+func (t *Service) GetProductsByCategoryId(categoryId int) ([]product.Product, error) {
+	ret := t.Called(categoryId)
+	var tProductSuccess []product.Product
+
+	if rf, ok := ret.Get(0).(func() []product.Product); ok {
+		tProductSuccess = rf()
+	} else {
+		if ret.Get(0) != nil {
+			tProductSuccess = ret.Get(0).([]product.Product)
+		}
+	}
 	return tProductSuccess, nil
 }
 

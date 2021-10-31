@@ -13,6 +13,7 @@ func HandlerApi(e *echo.Echo, productController *product.Controller, categoryCon
 	//Product
 	e.GET("/catalog/products", productController.GetAllProducts)
 	e.GET("/catalog/product/:productId", productController.GetProductsById)
+	e.GET("/catalog/filterproduct", productController.GetProductsByCategoryId)
 	e.POST("/catalog/product", productController.CreateProduct)
 	e.PUT("/catalog/product/:productId", productController.UpdateProduct)
 	e.DELETE("/catalog/product/:productId", productController.DeleteProduct)
