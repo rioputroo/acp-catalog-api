@@ -9,6 +9,7 @@ import (
 	productRepository "catalog/modules/product"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	categoryController "catalog/api/category"
@@ -86,5 +87,5 @@ func main() {
 	e := echo.New()
 	api.HandlerApi(e, prodHandler, catHandler)
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(os.Getenv("CATALOG_APP_PORT")))
 }
