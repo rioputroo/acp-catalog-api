@@ -1,8 +1,12 @@
 package request
 
-import "catalog/bussiness/category"
+import (
+	"catalog/bussiness/category"
+	"gorm.io/gorm"
+)
 
 type ResCategoryById struct {
+	gorm.Model
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
 	IsActive bool   `json:"is_active"`

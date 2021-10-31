@@ -2,8 +2,6 @@ package product
 
 import (
 	"catalog/bussiness/product"
-	"time"
-
 	"gorm.io/gorm"
 )
 
@@ -12,42 +10,37 @@ type DbRepository struct {
 }
 
 type ProductTable struct {
-	Id          int    `json:"id;primaryKey;autoIncrement"`
-	Category_id int    `json:"category_id"`
-	Name        string `json:"name"`
-	Price       int    `json:"price"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-	Is_active   bool   `json:"is_active"`
-	Created_At  time.Time
-	Updated_At  time.Time
+	gorm.Model
+	ID          uint   `json:"id" gorm:"id;primaryKey;autoIncrement"`
+	CategoryId  int    `json:"category_id" gorm:"category_id"`
+	Name        string `json:"name" gorm:"name"`
+	Price       int    `json:"price" gorm:"price"`
+	Description string `json:"description" gorm:"description"`
+	IsActive    bool   `json:"is_active" gorm:"is_active"`
 }
 
 //get field product form bussiness
 func newProduct(productTemp product.Product) *ProductTable {
 	return &ProductTable{
-		productTemp.Id,
-		productTemp.Category_id,
+		productTemp.Model,
+		productTemp.ID,
+		productTemp.CategoryId,
 		productTemp.Name,
 		productTemp.Price,
 		productTemp.Description,
-		productTemp.Image,
-		productTemp.Is_active,
-		productTemp.Created_At,
-		productTemp.Updated_At,
+		productTemp.IsActive,
 	}
 }
 
 func (field *ProductTable) ToProduct() product.Product {
 
 	var product product.Product
-	product.Id = field.Id
-	product.Category_id = field.Category_id
+	product.ID = field.ID
+	product.CategoryId = field.CategoryId
 	product.Name = field.Name
 	product.Price = field.Price
 	product.Description = field.Description
-	product.Image = field.Image
-	product.Is_active = field.Is_active
+	product.IsActive = field.IsActive
 	return product
 }
 
@@ -74,7 +67,7 @@ func (temp *DbRepository) GetAllProducts(categoryId int) ([]product.Product, err
 	var result []product.Product
 
 	if &categoryId != nil {
-		err := temp.DB.Find(&data, ProductTable{Category_id: categoryId}).Error
+		err := temp.DB.Find(&data, ProductTable{CategoryId: categoryId}).Error
 		if err != nil {
 			return nil, err
 		}

@@ -1,8 +1,12 @@
 package request
 
-import "catalog/bussiness/category"
+import (
+	"catalog/bussiness/category"
+	"gorm.io/gorm"
+)
 
 type ResCategory struct {
+	*gorm.Model
 	Category []ResCategoryById `json:"category"`
 }
 
