@@ -2,11 +2,15 @@ package product
 
 import (
 	"catalog/bussiness/product"
+	"encoding/json"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"gorm.io/gorm"
+	"log"
 )
 
 type DbRepository struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	rabbit *amqp.Connection
 }
 
 type ProductTable struct {
@@ -17,6 +21,16 @@ type ProductTable struct {
 	Price       int    `json:"price" gorm:"price"`
 	Description string `json:"description" gorm:"description"`
 	IsActive    bool   `json:"is_active" gorm:"is_active"`
+}
+
+//CartRabbitBody object for rabbtmq body message
+type CartRabbitBody struct {
+	ExchangeName      string `json:"exchange_name"`
+	ExchangeType      string `json:"exchange_type"`
+	PublishRoutingKey string `json:"publish_routing_key"`
+	ConsumeRoutingKey string `json:"consume_routing_key"`
+	QueueName         string `json:"queue_name"`
+	Data              []byte `json:"data"`
 }
 
 //get field product form bussiness
@@ -44,9 +58,10 @@ func (field *ProductTable) ToProduct() product.Product {
 	return product
 }
 
-func NewProductRepository(db *gorm.DB) *DbRepository {
+func NewProductRepository(db *gorm.DB, rabbit *amqp.Connection) *DbRepository {
 	return &DbRepository{
 		db,
+		rabbit,
 	}
 }
 
@@ -120,4 +135,151 @@ func (temp *DbRepository) DeleteProduct(id int) error {
 	}
 	return nil
 
+}
+
+//rabbit
+func (temp *DbRepository) Consume() {
+	var rabbitBody CartRabbitBody
+
+	rabbitBody.ExchangeName = "add_to_cart"
+	rabbitBody.ExchangeType = "topic"
+	rabbitBody.PublishRoutingKey = "product.product.read"
+	rabbitBody.ConsumeRoutingKey = "cart.item.added"
+	rabbitBody.QueueName = "cart_product_queue"
+
+	rabbitChannel := temp.createChannel()
+
+	temp.createExchange(rabbitChannel, rabbitBody)
+	temp.createQueue(rabbitChannel, rabbitBody)
+
+	msgs, err := rabbitChannel.Consume(
+		rabbitBody.QueueName, // queue
+		"",                   // consumer
+		true,                 // auto ack
+		false,                // exclusive
+		false,                // no local
+		false,                // no wait
+		nil,                  // args
+	)
+
+	if err != nil {
+		log.Println(err, "Failed to register a consumer")
+	}
+
+	//forever := make(chan bool)
+
+	var productId float64
+	var productTable ProductTable
+
+	//go func() {
+	var bodyReceived map[string]interface{}
+
+	for d := range msgs {
+		parseBody := json.Unmarshal(d.Body, &bodyReceived)
+
+		if parseBody != nil {
+			log.Printf("failed to parse body")
+		}
+
+		log.Printf("[x] Receive: %v", bodyReceived["product_id"])
+		productId = bodyReceived["product_id"].(float64)
+
+		log.Println(productId)
+
+		err = temp.DB.First(&productTable, productId).Error
+
+		if err != nil {
+			log.Printf("product not found")
+		}
+
+		productResult := productTable.ToProduct()
+		dataJson, _ := json.Marshal(productResult)
+
+		err = rabbitChannel.Publish(
+			rabbitBody.ExchangeName,
+			rabbitBody.PublishRoutingKey,
+			false,
+			false,
+			amqp.Publishing{
+				ContentType: "application/json",
+				Body:        dataJson},
+		)
+
+		if err != nil {
+			log.Printf("Failed to publish message: %s", err)
+		}
+
+		log.Printf("[x] Sent %s", string(dataJson))
+	}
+
+	//}()
+
+	log.Printf("[*] Waiting for any request. To exit press CTRL+C")
+
+	//defer rabbitChannel.Close()
+
+	//<-forever
+}
+
+func (temp *DbRepository) Publish(result product.Product) {
+
+}
+
+//createChannel create new channel in rabbitmq server
+func (temp *DbRepository) createChannel() *amqp.Channel {
+	ch, err := temp.rabbit.Channel()
+
+	if err != nil {
+		log.Printf("Failed to open a channel: %s", err)
+	}
+
+	return ch
+}
+
+//createExchange create exchange for communicate
+func (temp *DbRepository) createExchange(rabbitChannel *amqp.Channel, params CartRabbitBody) {
+	err := rabbitChannel.ExchangeDeclare(
+		params.ExchangeName,
+		params.ExchangeType,
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Printf("Failed to declare an exchange: %s", err)
+	}
+
+	log.Printf("[*] Exchange created %s", params.ExchangeName)
+}
+
+//createQueue create queue for consuming messages
+func (temp *DbRepository) createQueue(rabbitChannel *amqp.Channel, params CartRabbitBody) {
+	q, err := rabbitChannel.QueueDeclare(
+		params.QueueName, // name
+		false,            // durable
+		false,            // delete when unused
+		false,            // exclusive
+		false,            // no-wait
+		nil,              // arguments
+	)
+
+	if err != nil {
+		log.Println(err, "Failed to declare a queue")
+	}
+
+	log.Printf("Usage: %s [binding_key]...", params.ConsumeRoutingKey)
+
+	err = rabbitChannel.QueueBind(
+		q.Name,                   // queue name
+		params.ConsumeRoutingKey, // routing key
+		params.ExchangeName,      // exchange
+		false,
+		nil)
+
+	if err != nil {
+		log.Println(err, "Failed to bind a queue")
+	}
 }

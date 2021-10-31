@@ -8,7 +8,6 @@ import (
 	"catalog/config/rabbitmq"
 	"catalog/modules/migration"
 	productRepository "catalog/modules/product"
-	"catalog/modules/product/rabbitmq/consumer"
 	"fmt"
 	"log"
 	"os"
@@ -81,12 +80,14 @@ func main() {
 
 	rabbitmq := rabbitmq.RabbitConnection()
 
-	productRabbitmq := consumer.NewRabbitmqRepository(rabbitmq)
+	//productRabbitmq := consumer.NewRabbitmqRepository(rabbitmq)
 
-	prodRepository := productRepository.NewProductRepository(Conn)
+	prodRepository := productRepository.NewProductRepository(Conn, rabbitmq)
 
-	//prodService := productService.NewService(prodRepository)
-	prodService := productService.NewService(prodRepository, productRabbitmq)
+	prodRepository.Consume()
+
+	prodService := productService.NewService(prodRepository)
+	//prodService := productService.NewService(prodRepository, productRabbitmq)
 
 	prodHandler := productController.NewController(prodService)
 
