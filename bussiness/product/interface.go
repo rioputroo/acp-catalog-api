@@ -1,7 +1,9 @@
 package product
 
 type Service interface {
-	GetAllProducts(categoryId int) ([]Product, error)
+	GetProductsByCategoryId(categoryId int) ([]Product, error)
+
+	GetAllProducts() ([]Product, error)
 
 	GetProductById(id int) (*Product, error)
 
@@ -13,7 +15,9 @@ type Service interface {
 }
 
 type Repository interface {
-	GetAllProducts(categoryId int) ([]Product, error)
+	GetProductsByCategoryId(categoryId int) ([]Product, error)
+
+	GetAllProducts() ([]Product, error)
 
 	GetProductById(id int) (*Product, error)
 
