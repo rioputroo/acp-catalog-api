@@ -62,6 +62,17 @@ func setup() {
 
 }
 
+func TestGetProductsByCategoryId(t *testing.T) {
+	t.Run("Expect filter product by category", func(t *testing.T) {
+		productRepo.On("GetProductsByCategoryId", mock.AnythingOfType("int")).Return(productsData, nil).Once()
+
+		product, err := productService.GetProductsByCategoryId(id)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, product)
+	})
+}
+
 func TestCreateProduct(t *testing.T) {
 	t.Run("Expect create user success", func(t *testing.T) {
 		productRepo.On("CreateProduct", mock.AnythingOfType("product.Product"), mock.AnythingOfType("string")).Return(nil).Once()
@@ -105,7 +116,7 @@ func TestGetAllProducts(t *testing.T) {
 	t.Run("Expect found all product", func(t *testing.T) {
 		productRepo.On("GetAllProducts", mock.Anything).Return(productsData, nil).Once()
 
-		product, err := productService.GetAllProducts(category_id)
+		product, err := productService.GetAllProducts()
 
 		assert.Nil(t, err)
 		assert.NotNil(t, product)

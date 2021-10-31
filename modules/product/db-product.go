@@ -68,21 +68,32 @@ func (temp *DbRepository) GetProductById(id int) (*product.Product, error) {
 	return &product, nil
 }
 
-func (temp *DbRepository) GetAllProducts(categoryId int) ([]product.Product, error) {
+func (temp *DbRepository) GetProductsByCategoryId(categoryId int) ([]product.Product, error) {
+	var data []ProductTable
+	var result []product.Product
+
+	err := temp.DB.Find(&data, ProductTable{Category_id: categoryId}).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, value := range data {
+		result = append(result, value.ToProduct())
+	}
+
+	return result, nil
+
+}
+
+func (temp *DbRepository) GetAllProducts() ([]product.Product, error) {
 
 	var data []ProductTable
 	var result []product.Product
 
-	if &categoryId != nil {
-		err := temp.DB.Find(&data, ProductTable{Category_id: categoryId}).Error
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		err := temp.DB.Find(&data).Error
-		if err != nil {
-			return nil, err
-		}
+	err := temp.DB.Find(&data).Error
+	if err != nil {
+		return nil, err
 	}
 
 	for _, value := range data {
