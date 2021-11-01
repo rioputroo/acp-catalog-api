@@ -1,7 +1,7 @@
 # acp-catalog-api
-This is Catalog API for ACP Final Project using Golang
+This repository demonstrate smicroservices with Go using echo server. and using messaging with RabbitMQ and AMQPs
+![image](https://user-images.githubusercontent.com/51318143/139613619-e52eeeac-0647-49ca-a2c6-b242e2bbcdce.png)
 
-GOLANG REST API build using echo server.
 
 The code implementation was inspired by port and adapter pattern or known as hexagonal:
 
