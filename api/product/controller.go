@@ -32,16 +32,22 @@ func (controller *Controller) GetProductsById(c echo.Context) error {
 	return c.JSON(response.NewSuccessResponse(responseProduct, "successfully fetch product"))
 }
 
-func (controller *Controller) GetAllProducts(c echo.Context) error {
-
+func (controller *Controller) GetProductsByCategoryId(c echo.Context) error {
 	queryCatId, _ := strconv.Atoi(c.QueryParam("categoryId"))
-	products, err := controller.service.GetAllProducts(queryCatId)
+	product, err := controller.service.GetProductsByCategoryId(queryCatId)
 
-	if &queryCatId != nil {
-		resProductsByCategoryId, _ := controller.service.GetAllProducts(queryCatId)
-		return c.JSON(response.NewSuccessResponse(resProductsByCategoryId, "successfully filter product by category id"))
+	if err != nil {
+		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
 
+	responseProduct := request.GetProducts(product)
+	return c.JSON(response.NewSuccessResponse(responseProduct, "successfully filter product by category id"))
+
+}
+
+func (controller *Controller) GetAllProducts(c echo.Context) error {
+
+	products, err := controller.service.GetAllProducts()
 	if err != nil {
 		return c.JSON(response.NewErrorBusinessResponse(err))
 	}
