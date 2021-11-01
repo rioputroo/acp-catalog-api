@@ -1,9 +1,31 @@
 # Project Base Alterra Academy! :star:
 The ALTA Store demonstrates microservices with Go using echo server. The code implementation was inspired by port and adapter pattern or known as hexagonal:
 
--   **Business**<br/>Contains all the logic in domain business. Also called this as a service. All the interface of repository needed and the implementation of the service itself will be put here.
--   **Modules**<br/>Contains implementation of interfaces that defined at the business (also called as server-side adapters in hexagonal's term)
--   **Controller**<br/>Controller http handler or api (also called user-side adapters in hexagonal's term)
+The hexagonal architecture is based on three principles and techniques:
+
+- Explicitly separate User-Side, Business Logic, and Server-Side
+- Dependencies are going from User-Side and Server-Side to the Business Logic
+- We isolate the boundaries by using Ports and Adapters
+
+![image](https://user-images.githubusercontent.com/51318143/139618165-bdaeb6d7-dbf5-4b6c-bf27-3508be3f1dc7.png)
+
+<br>
+<br>
+## Use of RabbitMQ in Microservices
+RabbitMQ is one of the simplest freely available options for implementing messaging queues in your microservices architecture. These queue patterns can help to scale your application by communicating between various microservices.
+In this project using RabbitMQ still able to communicate between various microservices
+
+
+
+![image](https://user-images.githubusercontent.com/51318143/139615834-39f3edad-eeb4-4f19-b253-a8c8de2366c5.png)
+
+
+
+
+## Data initialization
+
+To describe about how port and adapter interaction (separation concerned), this example will have two databases supported. There are MySQL using gorm as library.
+
 
 
 
@@ -27,12 +49,7 @@ The ALTA Store demonstrates microservices with Go using echo server. The code im
 	GET Method "/order/checkout", to send checkout
 
 
-## Use of RabbitMQ in Microservices
-RabbitMQ is one of the simplest freely available options for implementing messaging queues in your microservices architecture. These queue patterns can help to scale your application by communicating between various microservices.
-In this project using RabbitMQ still able to communicate between various microservices
 
-
-![image](https://user-images.githubusercontent.com/51318143/139615834-39f3edad-eeb4-4f19-b253-a8c8de2366c5.png)
 
 
 
