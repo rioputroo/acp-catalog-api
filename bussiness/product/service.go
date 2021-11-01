@@ -9,6 +9,7 @@ type ProductField struct {
 	Description string `json:"description"`
 	IsActive    bool   `json:"is_active"`
 }
+
 type service struct {
 	repository Repository
 	rabbit     consumer.RabbitRepository
