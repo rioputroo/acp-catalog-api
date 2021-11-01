@@ -12,8 +12,8 @@ The hexagonal architecture is based on three principles and techniques:
 <br>
 <br>
 ## Use of RabbitMQ in Microservices
-RabbitMQ is one of the simplest freely available options for implementing messaging queues in your microservices architecture. These queue patterns can help to scale your application by communicating between various microservices.
-In this project using RabbitMQ still able to communicate between various microservices
+RabbitMQ is one of the simplest freely available options for implementing messaging queues in your microservices architecture. These queue patterns can help to scale your application communicating between microservices.
+In this project using RabbitMQ to able to communicate between various microservices
 
 
 
