@@ -19,7 +19,6 @@ jobs:
         run: go test ./... -cover
         
   build-push-docker:
-    name: build image and push docker hub
     name: Build and Push Docker to DockerHub
     runs-on: ubuntu-latest
     needs: unit-test
@@ -31,7 +30,7 @@ jobs:
         run: |
           echo "$CONFIG" > ./app.config.json
       - name: build image
-        run: docker build -t epankbole/acp:1.0 .
+        run: docker build -t rioputroo/acp-catalog-api:1.0 .
       - name: login docker hub
       - name: Generate Config File
         env:
@@ -39,7 +38,7 @@ jobs:
         run: |
           echo "$CONFIG" > ./app.config.json
       - name: Build Image
-        run: docker build -t epankbole/alta:1.0 .
+        run: docker build -t rioputroo/acp-catalog-api:1.0 .
 
       - name: Login DockerHub
         uses: docker/login-action@v1
@@ -48,8 +47,8 @@ jobs:
           password: ${{secrets.DOCKER_PASSWORD}}
 
       - name: push docker registry
-        run: docker push epankbole/acp:1.0
+        run: docker push rioputroo/acp-catalog-api:1.0
 
       - name: Push Docker Registry
-        run: docker push epankbole/alta:1.0
+        run: docker push rioputroo/acp-catalog-api:1.0
 
