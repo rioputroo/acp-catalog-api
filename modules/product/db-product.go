@@ -2,6 +2,7 @@ package product
 
 import (
 	"catalog/bussiness/product"
+
 	"gorm.io/gorm"
 )
 
@@ -65,7 +66,7 @@ func (temp *DbRepository) GetProductsByCategoryId(categoryId int) ([]product.Pro
 	var data []ProductTable
 	var result []product.Product
 
-	err := temp.DB.Find(&data, ProductTable{Category_id: categoryId}).Error
+	err := temp.DB.Find(&data, ProductTable{CategoryId: categoryId}).Error
 
 	if err != nil {
 		return nil, err
@@ -87,16 +88,6 @@ func (temp *DbRepository) GetAllProducts() ([]product.Product, error) {
 	err := temp.DB.Find(&data).Error
 	if err != nil {
 		return nil, err
-	if &categoryId != nil {
-		err := temp.DB.Find(&data, ProductTable{CategoryId: categoryId}).Error
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		err := temp.DB.Find(&data).Error
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	for _, value := range data {
