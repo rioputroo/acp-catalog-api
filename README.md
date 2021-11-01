@@ -47,4 +47,3 @@ To describe about how port and adapter interaction (separation concerned), this 
 	GET Method "/order/cart", to get cart
 	POST Method "/order/cart", to add item to cart
 	GET Method "/order/checkout", to send checkout
-
