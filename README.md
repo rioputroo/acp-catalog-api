@@ -13,6 +13,10 @@ To access endpoint products :
 # Use of RabbitMQ in Microservices
 RabbitMQ is one of the simplest freely available options for implementing messaging queues in your microservices architecture. These queue patterns can help to scale your application by communicating between various microservices.
 
+## Give a Star! :star:
+
+If you like or are using this project to learn or start your solution, please give it a star. Thanks!
+
 
 
 
