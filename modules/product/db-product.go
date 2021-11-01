@@ -1,11 +1,19 @@
 package product
 
 import (
+	"catalog/api"
+	categoryController "catalog/api/category"
+	productController "catalog/api/product"
+	categoryService "catalog/bussiness/category"
 	"catalog/bussiness/product"
+	productService "catalog/bussiness/product"
+	categoryRepository "catalog/modules/category"
 	"encoding/json"
+	"github.com/labstack/echo"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 type DbRepository struct {
@@ -149,87 +157,109 @@ func (temp *DbRepository) DeleteProduct(id int) error {
 }
 
 //rabbit
-func (temp *DbRepository) Consume() {
-	var rabbitBody CartRabbitBody
 
-	rabbitBody.ExchangeName = "add_to_cart"
-	rabbitBody.ExchangeType = "topic"
-	rabbitBody.PublishRoutingKey = "product.product.read"
-	rabbitBody.ConsumeRoutingKey = "cart.item.added"
-	rabbitBody.QueueName = "cart_product_queue"
-
-	rabbitChannel := temp.createChannel()
-
-	temp.createExchange(rabbitChannel, rabbitBody)
-	temp.createQueue(rabbitChannel, rabbitBody)
-
-	msgs, err := rabbitChannel.Consume(
-		rabbitBody.QueueName, // queue
-		"",                   // consumer
-		true,                 // auto ack
-		false,                // exclusive
-		false,                // no local
-		false,                // no wait
-		nil,                  // args
-	)
-
+func failOnError(err error, msg string) {
 	if err != nil {
-		log.Println(err, "Failed to register a consumer")
+		log.Fatalf("%s: %s", msg, err)
 	}
+}
 
-	//forever := make(chan bool)
+func (temp *DbRepository) Consume(Conn *gorm.DB) {
 
-	var productId float64
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"rpc_queue", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
+
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		false,  // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	failOnError(err, "Failed to register a consumer")
+
+	forever := make(chan bool)
+
+	var bodyReceived map[string]interface{}
 	var productTable ProductTable
 
-	//go func() {
-	var bodyReceived map[string]interface{}
+	go func() {
+		for d := range msgs {
 
-	for d := range msgs {
-		parseBody := json.Unmarshal(d.Body, &bodyReceived)
+			parseBody := json.Unmarshal(d.Body, &bodyReceived)
 
-		if parseBody != nil {
-			log.Printf("failed to parse body")
+			if parseBody != nil {
+				log.Printf("failed to parse body")
+			}
+
+			log.Printf("[x] Receive: %v", bodyReceived["product_id"])
+
+			err = temp.DB.First(&productTable, bodyReceived["product_id"]).Error
+
+			if err != nil {
+				log.Printf("product not found")
+			}
+
+			productResult := productTable.ToProduct()
+			dataJson, _ := json.Marshal(productResult)
+
+			err = ch.Publish(
+				"",        // exchange
+				d.ReplyTo, // routing key
+				false,     // mandatory
+				false,     // immediate
+				amqp.Publishing{
+					ContentType:   "application/json",
+					CorrelationId: d.CorrelationId,
+					Body:          dataJson,
+				})
+			failOnError(err, "Failed to publish a message")
+
+			log.Printf("[x] Sent %s", dataJson)
+
+			d.Ack(false)
 		}
+	}()
 
-		log.Printf("[x] Receive: %v", bodyReceived["product_id"])
-		productId = bodyReceived["product_id"].(float64)
+	log.Printf(" [*] Awaiting RPC requests")
 
-		log.Println(productId)
+	prodService := productService.NewService(temp)
 
-		err = temp.DB.First(&productTable, productId).Error
+	prodHandler := productController.NewController(prodService)
 
-		if err != nil {
-			log.Printf("product not found")
-		}
+	catRepository := categoryRepository.NewCategoryRepository(Conn)
+	catService := categoryService.NewService(catRepository)
+	catHandler := categoryController.NewController(catService)
 
-		productResult := productTable.ToProduct()
-		dataJson, _ := json.Marshal(productResult)
+	e := echo.New()
+	api.HandlerApi(e, prodHandler, catHandler)
 
-		err = rabbitChannel.Publish(
-			rabbitBody.ExchangeName,
-			rabbitBody.PublishRoutingKey,
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: "application/json",
-				Body:        dataJson},
-		)
-
-		if err != nil {
-			log.Printf("Failed to publish message: %s", err)
-		}
-
-		log.Printf("[x] Sent %s", string(dataJson))
-	}
-
-	//}()
-
-	log.Printf("[*] Waiting for any request. To exit press CTRL+C")
-
-	//defer rabbitChannel.Close()
-
-	//<-forever
+	e.Logger.Fatal(e.Start(os.Getenv("CATALOG_APP_PORT")))
+	<-forever
 }
 
 func (temp *DbRepository) Publish(result product.Product) {
@@ -268,13 +298,13 @@ func (temp *DbRepository) createExchange(rabbitChannel *amqp.Channel, params Car
 
 //createQueue create queue for consuming messages
 func (temp *DbRepository) createQueue(rabbitChannel *amqp.Channel, params CartRabbitBody) {
-	q, err := rabbitChannel.QueueDeclare(
-		params.QueueName, // name
-		false,            // durable
-		false,            // delete when unused
-		false,            // exclusive
-		false,            // no-wait
-		nil,              // arguments
+	_, err := rabbitChannel.QueueDeclare(
+		"rpc_queue", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
 
 	if err != nil {
@@ -283,14 +313,20 @@ func (temp *DbRepository) createQueue(rabbitChannel *amqp.Channel, params CartRa
 
 	log.Printf("Usage: %s [binding_key]...", params.ConsumeRoutingKey)
 
-	err = rabbitChannel.QueueBind(
-		q.Name,                   // queue name
-		params.ConsumeRoutingKey, // routing key
-		params.ExchangeName,      // exchange
-		false,
-		nil)
+	err = rabbitChannel.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
 
-	if err != nil {
-		log.Println(err, "Failed to bind a queue")
-	}
+	//err = rabbitChannel.QueueBind(
+	//	q.Name,                   // queue name
+	//	params.ConsumeRoutingKey, // routing key
+	//	params.ExchangeName,      // exchange
+	//	false,
+	//	nil)
+	//
+	//if err != nil {
+	//	log.Println(err, "Failed to bind a queue")
+	//}
 }

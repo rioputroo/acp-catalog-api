@@ -1,23 +1,14 @@
 package main
 
 import (
-	"catalog/api"
-	productController "catalog/api/product"
-	productService "catalog/bussiness/product"
 	"catalog/config"
 	"catalog/config/rabbitmq"
 	"catalog/modules/migration"
 	productRepository "catalog/modules/product"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
-	categoryController "catalog/api/category"
-	categoryService "catalog/bussiness/category"
-	categoryRepository "catalog/modules/category"
-
-	"github.com/labstack/echo"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -80,23 +71,7 @@ func main() {
 
 	rabbitmq := rabbitmq.RabbitConnection()
 
-	//productRabbitmq := consumer.NewRabbitmqRepository(rabbitmq)
-
 	prodRepository := productRepository.NewProductRepository(Conn, rabbitmq)
 
-	prodRepository.Consume()
-
-	prodService := productService.NewService(prodRepository)
-	//prodService := productService.NewService(prodRepository, productRabbitmq)
-
-	prodHandler := productController.NewController(prodService)
-
-	catRepository := categoryRepository.NewCategoryRepository(Conn)
-	catService := categoryService.NewService(catRepository)
-	catHandler := categoryController.NewController(catService)
-
-	e := echo.New()
-	api.HandlerApi(e, prodHandler, catHandler)
-
-	e.Logger.Fatal(e.Start(os.Getenv("CATALOG_APP_PORT")))
+	prodRepository.Consume(Conn)
 }
