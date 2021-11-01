@@ -1,6 +1,11 @@
 # acp-catalog-api
-This repository demonstrate smicroservices with Go using echo server. and using messaging with RabbitMQ and AMQPs
+This repository demonstrates microservices with Go using echo server. and using messaging with RabbitMQ and AMQPs
+
+
+
 ![image](https://user-images.githubusercontent.com/51318143/139613619-e52eeeac-0647-49ca-a2c6-b242e2bbcdce.png)
+
+
 
 
 The code implementation was inspired by port and adapter pattern or known as hexagonal:
