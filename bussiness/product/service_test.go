@@ -54,7 +54,7 @@ func setup() {
 		IsActive:    is_active,
 	}
 
-	productService = product.NewService(&productRepo, nil)
+	productService = product.NewService(&productRepo)
 
 }
 
