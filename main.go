@@ -1,22 +1,14 @@
 package main
 
 import (
-	"catalog/api"
-	productController "catalog/api/product"
-	productService "catalog/bussiness/product"
 	"catalog/config"
+	"catalog/config/rabbitmq"
 	"catalog/modules/migration"
 	productRepository "catalog/modules/product"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
-	categoryController "catalog/api/category"
-	categoryService "catalog/bussiness/category"
-	categoryRepository "catalog/modules/category"
-
-	"github.com/labstack/echo"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -76,16 +68,10 @@ func ConnectionMysql() *gorm.DB {
 
 func main() {
 	Conn := ConnectionMysql()
-	prodRepository := productRepository.NewProductRepository(Conn)
-	prodService := productService.NewService(prodRepository)
-	prodHandler := productController.NewController(prodService)
 
-	catRepository := categoryRepository.NewCategoryRepository(Conn)
-	catService := categoryService.NewService(catRepository)
-	catHandler := categoryController.NewController(catService)
+	rabbitmq := rabbitmq.RabbitConnection()
 
-	e := echo.New()
-	api.HandlerApi(e, prodHandler, catHandler)
+	prodRepository := productRepository.NewProductRepository(Conn, rabbitmq)
 
-	e.Logger.Fatal(e.Start(os.Getenv("CATALOG_APP_PORT")))
+	prodRepository.Consume(Conn)
 }

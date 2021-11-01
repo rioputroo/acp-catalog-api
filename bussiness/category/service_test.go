@@ -6,7 +6,6 @@ import (
 	catMock "catalog/bussiness/category/mocks"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -38,12 +37,11 @@ func setup() {
 	catData = category.NewCategory(
 		name,
 		is_active,
-		time.Now(),
 	)
 
 	createCat = category.CategoryField{
-		Name:      name,
-		Is_active: is_active,
+		Name:     name,
+		IsActive: is_active,
 	}
 
 	catService = category.NewService(&catRepo)

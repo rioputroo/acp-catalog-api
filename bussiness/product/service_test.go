@@ -6,7 +6,6 @@ import (
 	productMock "catalog/bussiness/product/mocks"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -44,26 +43,34 @@ func setup() {
 		name,
 		price,
 		description,
-		image,
 		is_active,
-		time.Now(),
 	)
 
 	createProduct = product.ProductField{
-		Category_id: category_id,
+		CategoryId:  category_id,
 		Name:        name,
 		Price:       price,
 		Description: description,
-		Image:       image,
-		Is_active:   is_active,
+		IsActive:    is_active,
 	}
 
 	productService = product.NewService(&productRepo)
 
 }
 
+func TestGetProductsByCategoryId(t *testing.T) {
+	t.Run("Expect filter product by category", func(t *testing.T) {
+		productRepo.On("GetProductsByCategoryId", mock.AnythingOfType("int")).Return(productsData, nil).Once()
+
+		product, err := productService.GetProductsByCategoryId(id)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, product)
+	})
+}
+
 func TestCreateProduct(t *testing.T) {
-	t.Run("Expect create user success", func(t *testing.T) {
+	t.Run("Expect create product success", func(t *testing.T) {
 		productRepo.On("CreateProduct", mock.AnythingOfType("product.Product"), mock.AnythingOfType("string")).Return(nil).Once()
 
 		err := productService.CreateProduct(createProduct)
@@ -105,7 +112,7 @@ func TestGetAllProducts(t *testing.T) {
 	t.Run("Expect found all product", func(t *testing.T) {
 		productRepo.On("GetAllProducts", mock.Anything).Return(productsData, nil).Once()
 
-		product, err := productService.GetAllProducts(category_id)
+		product, err := productService.GetAllProducts()
 
 		assert.Nil(t, err)
 		assert.NotNil(t, product)

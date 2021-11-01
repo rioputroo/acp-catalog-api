@@ -10,7 +10,7 @@ type Repository struct {
 	mock.Mock
 }
 
-func (t *Repository) GetAllProducts(categoryId int) ([]product.Product, error) {
+func (t *Repository) GetAllProducts() ([]product.Product, error) {
 	ret := t.Called()
 	var tProductSuccess []product.Product
 
@@ -22,13 +22,20 @@ func (t *Repository) GetAllProducts(categoryId int) ([]product.Product, error) {
 		}
 	}
 
-	// var tProductError error
+	return tProductSuccess, nil
+}
 
-	// if rf, ok := ret.Get(1).(func() error); ok {
-	// 	tProductError = rf()
-	// } else {
-	// 	tProductError = ret.Error(1)
-	// }
+func (t *Repository) GetProductsByCategoryId(categoryId int) ([]product.Product, error) {
+	ret := t.Called(categoryId)
+	var tProductSuccess []product.Product
+
+	if rf, ok := ret.Get(0).(func() []product.Product); ok {
+		tProductSuccess = rf()
+	} else {
+		if ret.Get(0) != nil {
+			tProductSuccess = ret.Get(0).([]product.Product)
+		}
+	}
 
 	return tProductSuccess, nil
 }

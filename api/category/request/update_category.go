@@ -12,7 +12,7 @@ func (request *UpdateReqCategory) UpdateExistCategory() *category.CategoryField 
 	var updateExistCategory category.CategoryField
 
 	updateExistCategory.Name = request.Name
-	updateExistCategory.Is_active = request.Is_active
+	updateExistCategory.IsActive = request.Is_active
 
 	return &updateExistCategory
 
